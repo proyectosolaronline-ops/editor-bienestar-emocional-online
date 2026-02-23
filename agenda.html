@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Agenda — Bienestar Emocional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rp:#FFE5F0;--ri:#FF85C0;--mp:#E8D5FF;--mi:#A67FFF;
+  --dark:#12101e;--dark2:#1e1b2e;--card:#ffffff;--bg:#f5f2ff;
+  --border:#ede8ff;--mid:#5A5570;--text:#2D2A3D;
+  --ok:#22c55e;--err:#ef4444;--warn:#f59e0b;
+  --radius:14px;--topbar:56px;--bottombar:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:300;height:var(--topbar);box-shadow:0 2px 12px rgba(166,127,255,.1);}
+.tb-l{display:flex;align-items:center;gap:.65rem;}
+.tb-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ri),var(--mi));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.tb-brand{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text);}
+.tb-brand span{color:var(--mi);}
+.tb-r{display:flex;align-items:center;gap:.4rem;}
+.uchip{display:flex;align-items:center;gap:.35rem;background:var(--bg);border:1px solid var(--border);border-radius:50px;padding:.25rem .7rem .25rem .3rem;}
+.uav{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--ri),var(--mi));display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;font-weight:700;flex-shrink:0;}
+.uname{font-size:.78rem;font-weight:600;}
+.main{padding-top:calc(var(--topbar) + 1rem);padding-bottom:calc(var(--bottombar) + 1rem);min-height:100vh;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--card);border-top:1px solid var(--border);display:flex;align-items:stretch;height:var(--bottombar);box-shadow:0 -4px 16px rgba(166,127,255,.1);}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;cursor:pointer;transition:all .2s;border:none;background:none;padding:.4rem .2rem;color:var(--mid);font-family:'Manrope',sans-serif;}
+.bn-item.on{color:var(--mi);}
+.bn-item .bn-ico{font-size:1.25rem;line-height:1;}
+.bn-item .bn-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
+.bn-new{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.1rem;cursor:pointer;border:none;background:none;padding:.4rem .2rem;}
+.bn-new-circle{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--ri),var(--mi));display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;box-shadow:0 4px 14px rgba(166,127,255,.45);margin-top:-18px;border:3px solid var(--card);}
+.bn-new .bn-lbl{font-size:.62rem;font-weight:700;color:var(--mi);text-transform:uppercase;letter-spacing:.05em;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem;}
+.badge{display:inline-flex;align-items:center;padding:.2rem .65rem;border-radius:50px;font-size:.7rem;font-weight:700;}
+.badge-ok{background:#f0fdf4;color:var(--ok);}
+.badge-warn{background:#fffbeb;color:var(--warn);}
+.badge-err{background:#fef2f2;color:var(--err);}
+/* DISPONIBILIDAD */
+.disp-slot{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.8rem;border-left:4px solid var(--ok);}
+.disp-slot.inactivo{border-left-color:#d1d5db;opacity:.6;}
+.disp-slot-info{flex:1;min-width:0;}
+.disp-slot-fecha{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:800;color:var(--text);}
+.disp-slot-hora{font-size:.78rem;color:var(--mi);font-weight:700;margin:.1rem 0;}
+.disp-slot-nota{font-size:.73rem;color:var(--mid);}
+.disp-slot-actions{display:flex;flex-direction:column;gap:.35rem;align-items:flex-end;flex-shrink:0;}
+.tog{position:relative;width:38px;height:21px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;position:absolute;}
+.tog-sl{position:absolute;inset:0;border-radius:50px;background:#d1d5db;cursor:pointer;transition:.3s;}
+.tog-sl::before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.tog input:checked+.tog-sl{background:linear-gradient(135deg,var(--ri),var(--mi));}
+.tog input:checked+.tog-sl::before{transform:translateX(17px);}
+.chip-activo{display:inline-block;padding:.1rem .5rem;border-radius:50px;font-size:.65rem;font-weight:700;background:#f0fdf4;color:var(--ok);}
+.chip-inactivo{display:inline-block;padding:.1rem .5rem;border-radius:50px;font-size:.65rem;font-weight:700;background:#f3f4f6;color:#6b7280;}
+/* CALENDARIO */
+.cal-wrap{padding:0 1rem;}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.cal-nav h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text);text-transform:capitalize;}
+.cal-nav-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.cal-nav-btn:active{border-color:var(--mi);background:var(--mp);}
+.cal-days-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;}
+.cal-days-head span{text-align:center;font-size:.6rem;font-weight:700;color:var(--mid);text-transform:uppercase;padding:.2rem 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-cell{aspect-ratio:1;border-radius:8px;padding:.2rem;cursor:pointer;transition:all .15s;background:var(--bg);border:1.5px solid transparent;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;}
+.cal-cell:active{transform:scale(.93);}
+.cal-cell.today{border-color:var(--mi);background:rgba(166,127,255,.08);}
+.cal-cell.selected{background:linear-gradient(135deg,var(--ri),var(--mi));border-color:transparent;}
+.cal-cell.selected .cal-num{color:#fff;}
+.cal-cell.other-month{opacity:.25;pointer-events:none;}
+.cal-cell.has-citas{background:#fff;border-color:rgba(166,127,255,.3);box-shadow:0 2px 6px rgba(166,127,255,.1);}
+.cal-num{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:var(--text);margin-top:.15rem;}
+.cal-dots{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:2px;}
+.cal-dots span{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.cal-cell.selected .cal-dots span{background:rgba(255,255,255,.8)!important;}
+.dot-pend{background:var(--warn);}
+.dot-conf{background:var(--ok);}
+.dot-canc{background:#d1d5db;}
+/* PANEL DIA */
+.day-panel{padding:0 1rem;margin-top:1.2rem;}
+.day-panel-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;color:var(--text);margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;}
+.cita-item{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:.9rem 1rem;margin-bottom:.6rem;cursor:pointer;transition:all .2s;border-left:4px solid var(--border);display:flex;align-items:center;gap:.8rem;}
+.cita-item:active{transform:scale(.98);}
+.cita-item.st-Pendiente{border-left-color:var(--warn);}
+.cita-item.st-Confirmada{border-left-color:var(--ok);}
+.cita-item.st-Cancelada{border-left-color:#d1d5db;opacity:.6;}
+.cita-hora-col{flex-shrink:0;text-align:center;min-width:44px;}
+.cita-hora{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;color:var(--mi);}
+.cita-info{flex:1;min-width:0;}
+.cita-nombre{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cita-servicio{font-size:.73rem;color:var(--mid);margin-top:.1rem;}
+.cita-chip{display:inline-block;padding:.12rem .55rem;border-radius:50px;font-size:.65rem;font-weight:700;margin-top:.2rem;}
+.est-Pendiente{background:#fffbeb;color:var(--warn);}
+.est-Confirmada{background:#f0fdf4;color:var(--ok);}
+.est-Cancelada{background:#f3f4f6;color:#6b7280;}
+.no-citas{text-align:center;padding:2rem 1rem;color:var(--mid);font-size:.85rem;line-height:1.8;}
+/* TODAS */
+.filtro-wrap{padding:0 1rem;margin-bottom:.75rem;display:flex;gap:.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.filtro-wrap::-webkit-scrollbar{display:none;}
+.filtro-chip{padding:.35rem .9rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--mid);white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.filtro-chip.on{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;border-color:transparent;}
+.todas-item{display:flex;align-items:center;gap:.8rem;padding:.9rem 1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.todas-item:last-child{border-bottom:none;}
+.todas-item:active{background:var(--bg);}
+.todas-fecha-col{flex-shrink:0;width:48px;text-align:center;background:linear-gradient(135deg,var(--rp),var(--mp));border-radius:10px;padding:.4rem .2rem;}
+.todas-fecha-day{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--mi);line-height:1;}
+.todas-fecha-mes{font-size:.58rem;font-weight:700;color:var(--mid);text-transform:uppercase;}
+.todas-info{flex:1;min-width:0;}
+.todas-hora{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:var(--mi);}
+.todas-nombre{font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.todas-servicio{font-size:.72rem;color:var(--mid);margin-top:.05rem;}
+.todas-estado{flex-shrink:0;}
+/* SHEET */
+.sheet-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(18,16,30,.7);backdrop-filter:blur(6px);}
+.sheet-overlay.show{display:block;}
+.sheet{position:fixed;bottom:0;left:0;right:0;z-index:5001;background:var(--card);border-radius:22px 22px 0 0;max-height:92vh;overflow-y:auto;transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1),-webkit-transform .35s cubic-bezier(.16,1,.3,1);-webkit-overflow-scrolling:touch;visibility:hidden;pointer-events:none;}
+.sheet.show{transform:translateY(0);visibility:visible;pointer-events:auto;}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:12px auto 0;}
+.sheet-head{padding:1rem 1.2rem .5rem;display:flex;align-items:center;justify-content:space-between;}
+.sheet-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text);}
+.sheet-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--mid);padding:.2rem;}
+.sheet-body{padding:.5rem 1.2rem 2.5rem;}
+.fg{margin-bottom:.9rem;}
+.fg label{display:block;font-size:.68rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.35rem;}
+input[type=text],input[type=email],input[type=tel],input[type=date],input[type=time],textarea,select{width:100%;padding:.75rem .95rem;border:1.5px solid var(--border);border-radius:10px;font-family:'Manrope',sans-serif;font-size:1rem;color:var(--text);background:#fafafa;outline:none;transition:all .2s;-webkit-appearance:none;appearance:none;}
+input:focus,textarea:focus,select:focus{border-color:var(--mi);background:#fff;box-shadow:0 0 0 3px rgba(166,127,255,.1);}
+textarea{min-height:70px;resize:vertical;line-height:1.6;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.divider{display:flex;align-items:center;gap:.6rem;margin:.9rem 0 .75rem;}
+.divider span{font-size:.65rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.8rem 1.2rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;width:100%;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;box-shadow:0 4px 14px rgba(166,127,255,.35);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+.btn-danger{background:#fef2f2;color:var(--err);border:1.5px solid #fecaca;}
+.btn-ghost{background:transparent;color:var(--mid);border:1.5px solid var(--border);}
+.btn-sm{padding:.5rem 1rem;font-size:.8rem;width:auto;}
+.wa-btn{background:#25D366;color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.8rem 1.2rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;border:none;width:100%;transition:all .2s;}
+.wa-btn:active{transform:scale(.97);}
+.mail-btn{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.8rem 1.2rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;border:none;width:100%;transition:all .2s;}
+.mail-btn:active{transform:scale(.97);}
+.btns-row{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem;}
+.spin{display:inline-block;width:14px;height:14px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.toasts{position:fixed;bottom:calc(var(--bottombar) + .8rem);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:9000;pointer-events:none;width:90%;max-width:340px;}
+.toast{background:var(--dark2);color:#fff;padding:.75rem 1.1rem;border-radius:12px;font-size:.83rem;font-weight:600;display:flex;align-items:center;gap:.5rem;box-shadow:0 8px 24px rgba(0,0,0,.3);width:100%;animation:toastIn .3s ease;pointer-events:auto;}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.sec-header{padding:0 1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;}
+.sec-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);}
+/* DESK NAV BUTTONS */
+.desk-nav-btn{padding:.38rem .85rem;border-radius:50px;font-family:'Manrope',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:transparent;color:var(--mid);white-space:nowrap;transition:all .2s;}
+.desk-nav-btn:hover{border-color:var(--mi);color:var(--mi);}
+.desk-nav-btn.on{background:linear-gradient(135deg,var(--ri),var(--mi));color:#fff;border-color:transparent;}
+/* DESKTOP */
+@media(min-width:768px){
+  .main{padding-top:calc(var(--topbar)+1.5rem);padding-bottom:2rem;max-width:960px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem;}
+  .bottom-nav{display:none;}
+  .desk-btns{display:flex!important;}
+  .desk-nav{display:flex!important;}
+  .cal-wrap,.day-panel,.sec-header,.filtro-wrap{padding:0;}
+  .cal-layout{display:grid;grid-template-columns:1fr 300px;gap:1.4rem;align-items:start;}
+  .todas-card{margin:0;}
+  .sheet{position:fixed;top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%) scale(.95);border-radius:20px;width:500px;max-width:95vw;max-height:90vh;visibility:hidden;pointer-events:none;}
+  .sheet.show{transform:translate(-50%,-50%) scale(1);visibility:visible;pointer-events:auto;}
+  .cal-cell{aspect-ratio:auto;min-height:58px;}
+  .cal-num{font-size:.85rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-l">
+    <div class="tb-logo">📅</div>
+    <div class="tb-brand">Agenda <span>Bienestar Emocional</span></div>
+    <!-- NAV DESKTOP: visible solo en >=768px -->
+    <nav class="desk-nav" style="display:none;gap:.3rem;margin-left:1.2rem;">
+      <button class="desk-nav-btn on" id="dnb-cal"   onclick="showView('cal',null);deskNavOn('dnb-cal')">📅 Calendario</button>
+      <button class="desk-nav-btn"    id="dnb-disp"  onclick="showView('disp',null);deskNavOn('dnb-disp')">🟢 Disponibilidad</button>
+      <button class="desk-nav-btn"    id="dnb-todas" onclick="showView('todas',null);deskNavOn('dnb-todas')">📋 Todas</button>
+    </nav>
+  </div>
+  <div class="tb-r">
+    <div class="uchip">
+      <div class="uav" id="uav">A</div>
+      <div><div class="uname" id="uname">—</div></div>
+    </div>
+    <div class="desk-btns" style="display:none;gap:.4rem;align-items:center;">
+      <button id="desk-ctx-btn" class="btn btn-primary btn-sm" style="width:auto;display:none;" onclick="openCitaForm(null)">＋ Nueva cita</button>
+      <a href="https://bienestaremocionalwepapp-code.github.io/editor-bienestar-emocional-online/" class="btn btn-ghost btn-sm" style="width:auto;text-decoration:none;">← Editor</a>
+      <button class="btn btn-danger btn-sm" style="width:auto;" onclick="doLogout()">🚪 Salir</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- VISTA CALENDARIO -->
+  <div id="view-cal">
+    <div class="cal-layout" style="display:block;">
+      <div>
+        <div class="cal-wrap">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="agMes(-1)">&#8592;</button>
+            <h3 id="cal-titulo">—</h3>
+            <div style="display:flex;align-items:center;gap:.4rem;">
+              <span class="badge badge-ok" id="ag-badge" style="font-size:.68rem;">—</span>
+              <button class="cal-nav-btn" onclick="agMes(+1)">&#8594;</button>
+            </div>
+          </div>
+          <div class="cal-days-head">
+            <span>D</span><span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+        </div>
+        <div class="day-panel" id="day-panel" style="display:none;">
+          <div class="day-panel-title">
+            <span id="ag-day-title">—</span>
+            <button class="btn btn-primary btn-sm" style="width:auto;" onclick="openCitaForm(null)">+ Cita</button>
+          </div>
+          <div id="ag-day-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA TODAS -->
+  <div id="view-todas" style="display:none;">
+    <div class="sec-header">
+      <div class="sec-title">📋 Todas las citas</div>
+    </div>
+    <div class="filtro-wrap">
+      <button class="filtro-chip on" onclick="setFiltro('',this)">Todas</button>
+      <button class="filtro-chip" onclick="setFiltro('Pendiente',this)">⏳ Pendiente</button>
+      <button class="filtro-chip" onclick="setFiltro('Confirmada',this)">✅ Confirmada</button>
+      <button class="filtro-chip" onclick="setFiltro('Cancelada',this)">❌ Cancelada</button>
+    </div>
+    <div class="card todas-card" style="margin:0 1rem;">
+      <div id="todas-list"></div>
+    </div>
+  </div>
+
+  <!-- VISTA DISPONIBILIDAD -->
+  <div id="view-disp" style="display:none;">
+    <div class="sec-header">
+      <div class="sec-title">🟢 Disponibilidad</div>
+      <button class="btn btn-primary btn-sm" style="width:auto;" onclick="openDispForm(null)">+ Publicar</button>
+    </div>
+    <div id="disp-list" style="padding:0 1rem;"></div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="bn-item on" id="bn-cal" onclick="showView('cal',this)">
+    <span class="bn-ico">📅</span>
+    <span class="bn-lbl">Calendario</span>
+  </button>
+  <button class="bn-new" onclick="openCitaForm(null)">
+    <div class="bn-new-circle">＋</div>
+    <span class="bn-lbl">Nueva</span>
+  </button>
+  <button class="bn-item" id="bn-disp" onclick="showView('disp',this)">
+    <span class="bn-ico">🟢</span>
+    <span class="bn-lbl">Disponib.</span>
+  </button>
+  <button class="bn-item" id="bn-todas" onclick="showView('todas',this)">
+    <span class="bn-ico">📋</span>
+    <span class="bn-lbl">Todas</span>
+  </button>
+</nav>
+
+<!-- SHEET CITAS -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeCitaSheet()"></div>
+<div class="sheet" id="citaSheet" onclick="event.stopPropagation()">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="sheet-title">📅 Nueva cita</div>
+    <button class="sheet-close" onclick="closeCitaSheet()">✕</button>
+  </div>
+  <div class="sheet-body">
+    <input type="hidden" id="cita-id">
+    <div class="g2">
+      <div class="fg"><label>Fecha</label><input type="date" id="cita-fecha"></div>
+      <div class="fg"><label>Hora</label><input type="time" id="cita-hora"></div>
+    </div>
+    <div class="fg"><label>Nombre del paciente</label><input type="text" id="cita-nombre" placeholder="Nombre completo"></div>
+    <div class="fg"><label>Teléfono / WhatsApp</label><input type="tel" id="cita-telefono" placeholder="4421234567"></div>
+    <div class="fg">
+      <label>Correo <span style="font-weight:400;color:var(--mid);text-transform:none;font-size:.7rem;">(para link de confirmación)</span></label>
+      <input type="email" id="cita-correo" placeholder="correo@ejemplo.com">
+    </div>
+    <div class="fg">
+      <label>Servicio</label>
+      <select id="cita-servicio">
+        <option value="">— Seleccionar —</option>
+        <option>Empresas</option>
+        <option>Escuelas</option>
+        <option>Niños y Adolescentes</option>
+        <option>Adultos</option>
+        <option>Evaluaciones</option>
+      </select>
+    </div>
+    <div class="fg"><label>Motivo / notas</label><textarea id="cita-motivo" placeholder="Motivo o notas..."></textarea></div>
+    <div class="fg">
+      <label>Estado</label>
+      <select id="cita-estado">
+        <option value="Pendiente">⏳ Pendiente</option>
+        <option value="Confirmada">✅ Confirmada</option>
+        <option value="Cancelada">❌ Cancelada</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="btn-guardar" onclick="saveCita()">💾 Guardar cita</button>
+    <div id="cita-notify" style="display:none;">
+      <div class="divider"><span>Notificar al paciente</span></div>
+      <div class="btns-row">
+        <button class="mail-btn" id="btn-mail" onclick="sendCorreoCita()">✉️ Correo</button>
+        <button class="wa-btn" id="btn-wa" onclick="sendWhatsAppCita()">💬 WhatsApp</button>
+      </div>
+    </div>
+    <div id="cita-delete" style="display:none;margin-top:.75rem;">
+      <button class="btn btn-danger" onclick="deleteCitaUI()">🗑 Eliminar esta cita</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET DISPONIBILIDAD -->
+<div class="sheet-overlay" id="dispOverlay" onclick="closeDispSheet()"></div>
+<div class="sheet" id="dispSheet" onclick="event.stopPropagation()">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="disp-sheet-title">🟢 Publicar disponibilidad</div>
+    <button class="sheet-close" onclick="closeDispSheet()">✕</button>
+  </div>
+  <div class="sheet-body">
+    <input type="hidden" id="disp-id">
+    <div class="fg"><label>Fecha</label><input type="date" id="disp-fecha"></div>
+    <div class="g2">
+      <div class="fg"><label>Hora inicio</label><input type="time" id="disp-inicio" value="09:00"></div>
+      <div class="fg"><label>Hora fin</label><input type="time" id="disp-fin" value="18:00"></div>
+    </div>
+    <div class="fg">
+      <label>Nota <span style="font-weight:400;color:var(--mid);text-transform:none;font-size:.7rem;">(opcional)</span></label>
+      <input type="text" id="disp-nota" placeholder="Ej: Solo online, Presencial, Últimos lugares...">
+    </div>
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;padding:.75rem 1rem;background:var(--bg);border-radius:10px;">
+      <label class="tog"><input type="checkbox" id="disp-activo" checked><span class="tog-sl"></span></label>
+      <div>
+        <div style="font-size:.85rem;font-weight:700;">Visible para pacientes</div>
+        <div style="font-size:.72rem;color:var(--mid);">Aparece en la página principal</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-disp-guardar" onclick="saveDisp()">💾 Guardar disponibilidad</button>
+    <div id="disp-delete" style="display:none;margin-top:.75rem;">
+      <button class="btn btn-danger" onclick="deleteDispUI()">🗑 Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+'use strict';
+var PROXY  = 'https://script.google.com/macros/s/AKfycbw33rJe4JWLUnSHYuRuf4x_FW90YKMA-i2PEHXCoJwqYmUcih90NVV9JpUe_i0jrQli/exec';
+var EDITOR = 'https://bienestaremocionalwepapp-code.github.io/editor-bienestar-emocional-online/';
+var INACT_MS = 20*60*1000;
+var currentUser=null, inactTimer=null;
+
+(function(){
+  try{
+    var s=JSON.parse(sessionStorage.getItem('be_sess'));
+    if(s&&(Date.now()-s.ts)<INACT_MS){
+      currentUser=s;
+      document.getElementById('uav').textContent=s.nombre.charAt(0).toUpperCase();
+      document.getElementById('uname').textContent=s.nombre;
+      resetInact();
+      ['mousemove','keydown','touchstart','click'].forEach(function(ev){document.addEventListener(ev,resetInact,{passive:true});});
+      init();
+    } else { window.location.href=EDITOR; }
+  } catch(e){ window.location.href=EDITOR; }
+})();
+
+function resetInact(){clearTimeout(inactTimer);inactTimer=setTimeout(function(){toast('Sesión cerrada por inactividad','warn');doLogout();},INACT_MS);}
+function doLogout(){clearTimeout(inactTimer);sessionStorage.removeItem('be_sess');window.location.href=EDITOR;}
+
+function deskNavOn(id){
+  document.querySelectorAll('.desk-nav-btn').forEach(function(b){b.classList.remove('on');});
+  var el=document.getElementById(id);if(el)el.classList.add('on');
+}
+
+var agYear=new Date().getFullYear(),agMonth=new Date().getMonth();
+var agCitas=[],agSelectedDate=null,agEditingId=null,filtroActualVal='';
+var MESES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var MESES_C=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function init(){loadAgenda();}
+
+function apiPost(action,payload){
+  return fetch(PROXY,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(Object.assign({action:action},payload))})
+    .then(function(r){return r.text();})
+    .then(function(t){var j=JSON.parse(t);if(!j.ok)throw new Error(j.error||'Error');return j;});
+}
+
+function loadAgenda(){
+  var badge=document.getElementById('ag-badge');
+  badge.textContent='...';badge.className='badge badge-warn';
+  var mes=agYear+'-'+String(agMonth+1).padStart(2,'0');
+  fetch(PROXY+'?tab=Agenda&mes='+mes,{redirect:'follow'})
+    .then(function(r){return r.text();})
+    .then(function(t){
+      var j=JSON.parse(t);if(!j.ok)throw new Error(j.error||'Error');
+      agCitas=j.citas||[];
+      renderCalendar();renderTodas();
+      badge.textContent=agCitas.length+' cita'+(agCitas.length!==1?'s':'');
+      badge.className='badge badge-ok';
+      if(agSelectedDate)renderDayPanel(agSelectedDate);
+    })
+    .catch(function(e){toast('Error: '+e.message,'err');badge.textContent='Error';badge.className='badge badge-err';});
+}
+
+function showView(name,el){
+  document.getElementById('view-cal').style.display=name==='cal'?'':'none';
+  document.getElementById('view-todas').style.display=name==='todas'?'':'none';
+  document.getElementById('view-disp').style.display=name==='disp'?'':'none';
+  if(name==='disp') loadDisp();
+  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('on');});
+  if(el)el.classList.add('on');
+  deskNavOn('dnb-'+name);
+  // Botón contextual desktop
+  var ctx=document.getElementById('desk-ctx-btn');
+  if(ctx){
+    if(name==='disp'){
+      ctx.style.display='';ctx.textContent='+ Publicar';
+      ctx.onclick=function(){openDispForm(null);};
+    } else if(name==='cal'){
+      ctx.style.display='';ctx.textContent='＋ Nueva cita';
+      ctx.onclick=function(){openCitaForm(null);};
+    } else {
+      ctx.style.display='none';
+    }
+  }
+}
+
+function agMes(dir){
+  agMonth+=dir;
+  if(agMonth>11){agMonth=0;agYear++;}
+  if(agMonth<0){agMonth=11;agYear--;}
+  agSelectedDate=null;
+  document.getElementById('day-panel').style.display='none';
+  loadAgenda();
+}
+
+function renderCalendar(){
+  document.getElementById('cal-titulo').textContent=MESES[agMonth]+' '+agYear;
+  var grid=document.getElementById('cal-grid');grid.innerHTML='';
+  var firstDay=new Date(agYear,agMonth,1).getDay();
+  var daysInMonth=new Date(agYear,agMonth+1,0).getDate();
+  var daysInPrev=new Date(agYear,agMonth,0).getDate();
+  var todayStr=fmtDate(new Date());
+  for(var p=firstDay-1;p>=0;p--)grid.appendChild(makeCell(daysInPrev-p,agYear,agMonth-1,true,todayStr));
+  for(var d=1;d<=daysInMonth;d++)grid.appendChild(makeCell(d,agYear,agMonth,false,todayStr));
+  while(grid.children.length%7!==0)grid.appendChild(makeCell(grid.children.length-firstDay-daysInMonth+1,agYear,agMonth+1,true,todayStr));
+}
+
+function makeCell(day,year,month,otherMonth,todayStr){
+  var ry=year,rm=month;
+  if(rm<0){rm=11;ry--;}if(rm>11){rm=0;ry++;}
+  var dateStr=ry+'-'+String(rm+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+  var citasDay=agCitas.filter(function(c){return c.fecha===dateStr;});
+  var cell=document.createElement('div');
+  cell.className='cal-cell'+(otherMonth?' other-month':'')+(dateStr===todayStr?' today':'')+(citasDay.length?' has-citas':'')+(dateStr===agSelectedDate?' selected':'');
+  var dots=citasDay.slice(0,4).map(function(c){
+    return '<span class="'+(c.estado==='Confirmada'?'dot-conf':c.estado==='Cancelada'?'dot-canc':'dot-pend')+'"></span>';
+  }).join('');
+  cell.innerHTML='<span class="cal-num">'+day+'</span><div class="cal-dots">'+dots+'</div>';
+  if(!otherMonth)cell.onclick=function(){selectDay(dateStr);};
+  return cell;
+}
+
+function selectDay(dateStr){
+  agSelectedDate=dateStr;
+  renderCalendar();
+  renderDayPanel(dateStr);
+  document.getElementById('day-panel').style.display='';
+  setTimeout(function(){document.getElementById('day-panel').scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+
+function renderDayPanel(dateStr){
+  var parts=dateStr.split('-');
+  document.getElementById('ag-day-title').textContent=parseInt(parts[2])+' de '+MESES[parseInt(parts[1])-1];
+  var citasDay=agCitas.filter(function(c){return c.fecha===dateStr;});
+  citasDay.sort(function(a,b){return(a.hora||'').localeCompare(b.hora||'');});
+  var list=document.getElementById('ag-day-list');
+  if(!citasDay.length){list.innerHTML='<div class="no-citas">Sin citas este día<br><small>Toca + Cita para agregar</small></div>';return;}
+  list.innerHTML=citasDay.map(function(c){
+    return '<div class="cita-item st-'+c.estado+'" onclick=\'openCitaForm('+JSON.stringify(c)+')\'>'
+      +'<div class="cita-hora-col"><div class="cita-hora">'+(c.hora||'—')+'</div></div>'
+      +'<div class="cita-info"><div class="cita-nombre">'+esc(c.nombre)+'</div>'
+      +'<div class="cita-servicio">'+esc(c.servicio)+'</div>'
+      +'<span class="cita-chip est-'+c.estado+'">'+c.estado+'</span></div></div>';
+  }).join('');
+}
+
+function setFiltro(val,el){
+  filtroActualVal=val;
+  document.querySelectorAll('.filtro-chip').forEach(function(c){c.classList.remove('on');});
+  if(el)el.classList.add('on');
+  renderTodas();
+}
+
+function renderTodas(){
+  var lista=agCitas.slice();
+  if(filtroActualVal)lista=lista.filter(function(c){return c.estado===filtroActualVal;});
+  lista.sort(function(a,b){return(a.fecha+a.hora).localeCompare(b.fecha+b.hora);});
+  var el=document.getElementById('todas-list');
+  if(!lista.length){el.innerHTML='<div class="no-citas" style="padding:3rem;">Sin citas para mostrar</div>';return;}
+  el.innerHTML=lista.map(function(c){
+    var p=(c.fecha||'').split('-');
+    var dia=p[2]||'—',mes=p[1]?MESES_C[parseInt(p[1])-1]:'—';
+    return '<div class="todas-item" onclick=\'openCitaForm('+JSON.stringify(c)+')\'>'
+      +'<div class="todas-fecha-col"><div class="todas-fecha-day">'+dia+'</div><div class="todas-fecha-mes">'+mes+'</div></div>'
+      +'<div class="todas-info"><div class="todas-hora">'+(c.hora||'—')+'</div>'
+      +'<div class="todas-nombre">'+esc(c.nombre)+'</div>'
+      +'<div class="todas-servicio">'+esc(c.servicio)+'</div></div>'
+      +'<div class="todas-estado"><span class="cita-chip est-'+c.estado+'">'+c.estado+'</span></div>'
+      +'</div>';
+  }).join('');
+}
+
+function openCitaForm(cita){
+  agEditingId=cita?cita.id:null;
+  document.getElementById('sheet-title').textContent=cita?'✏️ Editar cita':'📅 Nueva cita';
+  document.getElementById('cita-id').value=cita?cita.id:'';
+  document.getElementById('cita-fecha').value=cita?cita.fecha:(agSelectedDate||'');
+  document.getElementById('cita-hora').value=cita?cita.hora:'';
+  document.getElementById('cita-nombre').value=cita?cita.nombre:'';
+  document.getElementById('cita-telefono').value=cita?cita.telefono:'';
+  document.getElementById('cita-correo').value=cita?(cita.correo||''):'';
+  document.getElementById('cita-servicio').value=cita?cita.servicio:'';
+  document.getElementById('cita-motivo').value=cita?cita.motivo:'';
+  document.getElementById('cita-estado').value=cita?cita.estado:'Pendiente';
+  document.getElementById('cita-notify').style.display=cita?'':'none';
+  document.getElementById('cita-delete').style.display=cita?'':'none';
+  document.getElementById('btn-guardar').innerHTML='💾 Guardar cita';
+  setTimeout(function(){
+    document.getElementById('sheetOverlay').classList.add('show');
+    document.getElementById('citaSheet').classList.add('show');
+    document.body.style.overflow='hidden';
+  }, 10);
+}
+
+function closeCitaSheet(){
+  document.getElementById('sheetOverlay').classList.remove('show');
+  document.getElementById('citaSheet').classList.remove('show');
+  document.body.style.overflow='';
+  agEditingId=null;
+}
+
+function saveCita(){
+  var fecha=document.getElementById('cita-fecha').value;
+  var nombre=document.getElementById('cita-nombre').value.trim();
+  var tel=document.getElementById('cita-telefono').value.trim();
+  if(!fecha){toast('La fecha es obligatoria.','err');return;}
+  if(!nombre){toast('El nombre es obligatorio.','err');return;}
+  if(!tel){toast('El teléfono es obligatorio.','err');return;}
+  var data={id:agEditingId||'',fecha:fecha,hora:document.getElementById('cita-hora').value,
+    nombre:nombre,telefono:tel,correo:document.getElementById('cita-correo').value.trim(),
+    servicio:document.getElementById('cita-servicio').value,
+    motivo:document.getElementById('cita-motivo').value.trim(),
+    estado:document.getElementById('cita-estado').value};
+  var btn=document.getElementById('btn-guardar');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span> Guardando...';
+  apiPost(agEditingId?'updateCita':'createCita',{data:data})
+    .then(function(res){
+      if(!agEditingId&&res.id){agEditingId=res.id;document.getElementById('cita-id').value=res.id;}
+      document.getElementById('sheet-title').textContent='✏️ Editar cita';
+      document.getElementById('cita-notify').style.display='';
+      document.getElementById('cita-delete').style.display='';
+      toast('Cita guardada ✅','ok');
+      loadAgenda();
+    })
+    .catch(function(e){toast('Error: '+e.message,'err');})
+    .finally(function(){btn.disabled=false;btn.innerHTML='💾 Guardar cita';});
+}
+
+function deleteCitaUI(){
+  if(!agEditingId)return;
+  if(!confirm('¿Eliminar esta cita?'))return;
+  apiPost('deleteCita',{id:agEditingId})
+    .then(function(){toast('Cita eliminada.','warn');closeCitaSheet();loadAgenda();})
+    .catch(function(e){toast('Error: '+e.message,'err');});
+}
+
+function getCitaActual(){
+  return{id:document.getElementById('cita-id').value,fecha:document.getElementById('cita-fecha').value,
+    hora:document.getElementById('cita-hora').value,nombre:document.getElementById('cita-nombre').value,
+    telefono:document.getElementById('cita-telefono').value,correo:document.getElementById('cita-correo').value,
+    servicio:document.getElementById('cita-servicio').value,motivo:document.getElementById('cita-motivo').value,
+    estado:document.getElementById('cita-estado').value};
+}
+
+function sendCorreoCita(){
+  var cita=getCitaActual();
+  if(!cita.correo){toast('Agrega un correo primero.','warn');return;}
+  var btn=document.getElementById('btn-mail');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>';
+  apiPost('enviarCorreoCita',{data:cita})
+    .then(function(r){toast(r.sent?'✉️ Correo enviado':'⚠️ '+(r.reason||'No enviado'),r.sent?'ok':'warn');})
+    .catch(function(e){toast('Error: '+e.message,'err');})
+    .finally(function(){btn.disabled=false;btn.innerHTML='✉️ Correo';});
+}
+
+function sendWhatsAppCita(){
+  var cita=getCitaActual();
+  if(!cita.telefono){toast('Agrega un teléfono primero.','warn');return;}
+  var tel=cita.telefono.replace(/\D/g,'');
+  if(tel.length===10)tel='52'+tel;
+  var msg='💜 Hola '+cita.nombre+', te confirmamos tu cita en *Bienestar Emocional*:\n\n'
+    +'📅 *Fecha:* '+cita.fecha+'\n🕐 *Hora:* '+cita.hora+'\n🏷️ *Servicio:* '+cita.servicio+'\n'
+    +(cita.motivo?'📝 *Motivo:* '+cita.motivo+'\n':'')
+    +'\nPor favor confírmanos tu asistencia respondiendo este mensaje. ¡Te esperamos! 💜';
+  window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg,type){
+  var c=document.getElementById('toasts'),t=document.createElement('div');
+  t.className='toast';t.style.borderLeft='3px solid '+(type==='ok'?'var(--ok)':type==='err'?'var(--err)':'var(--warn)');
+  t.textContent=msg;c.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='.3s';setTimeout(function(){t.remove();},350);},3500);
+}
+
+// ══════════════════════════════════════════
+//  DISPONIBILIDAD
+// ══════════════════════════════════════════
+var dispData = [], dispEditingId = null;
+
+function loadDisp() {
+  fetch(PROXY + '?tab=Disponibilidad', { redirect: 'follow' })
+    .then(function(r){ return r.text(); })
+    .then(function(t){
+      var j = JSON.parse(t); if (!j.ok) throw new Error(j.error || 'Error');
+      dispData = j.slots || [];
+      renderDisp();
+    })
+    .catch(function(e){ toast('Error disponibilidad: ' + e.message, 'err'); });
+}
+
+function renderDisp() {
+  var el = document.getElementById('disp-list');
+  var hoy = fmtDate(new Date());
+  var lista = dispData.filter(function(d){ return d.fecha >= hoy; });
+  lista.sort(function(a,b){ return (a.fecha+a.hora_inicio).localeCompare(b.fecha+b.hora_inicio); });
+  if (!lista.length) {
+    el.innerHTML = '<div class="no-citas">Sin disponibilidad publicada<br><small>Toca + Publicar para agregar</small></div>';
+    return;
+  }
+  // ── FIX: construir cada tarjeta con createElement para evitar comillas rotas ──
+  el.innerHTML = '';
+  lista.forEach(function(d) {
+    var activo = d.activo === 'true';
+    var fechaLabel = formatFechaLabel(d.fecha);
+
+    var slot = document.createElement('div');
+    slot.className = 'disp-slot' + (activo ? '' : ' inactivo');
+
+    var info = document.createElement('div');
+    info.className = 'disp-slot-info';
+    info.innerHTML =
+      '<div class="disp-slot-fecha">' + fechaLabel + '</div>' +
+      '<div class="disp-slot-hora">🕐 ' + (d.hora_inicio||'') + (d.hora_fin ? ' — ' + d.hora_fin : '') + '</div>' +
+      (d.nota ? '<div class="disp-slot-nota">' + esc(d.nota) + '</div>' : '');
+
+    var actions = document.createElement('div');
+    actions.className = 'disp-slot-actions';
+
+    var chip = document.createElement('span');
+    chip.className = activo ? 'chip-activo' : 'chip-inactivo';
+    chip.textContent = activo ? 'Visible' : 'Oculto';
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:.4rem;';
+
+    var btnEdit = document.createElement('button');
+    btnEdit.style.cssText = 'font-size:.72rem;padding:.3rem .65rem;border-radius:8px;border:1.5px solid var(--border);background:none;cursor:pointer;color:var(--mi);font-family:Manrope,sans-serif;font-weight:600;';
+    btnEdit.textContent = '✏️ Editar';
+    btnEdit.onclick = (function(slot){ return function(){ openDispForm(slot); }; })(d);
+
+    var btnToggle = document.createElement('button');
+    btnToggle.style.cssText = 'font-size:.72rem;padding:.3rem .65rem;border-radius:8px;border:1.5px solid #fecaca;background:#fef2f2;cursor:pointer;color:var(--err);font-family:Manrope,sans-serif;font-weight:600;';
+    btnToggle.textContent = activo ? 'Ocultar' : 'Mostrar';
+    btnToggle.onclick = (function(id, cur){ return function(){ quickToggleDisp(id, cur); }; })(d.id, activo);
+
+    btnRow.appendChild(btnEdit);
+    btnRow.appendChild(btnToggle);
+    actions.appendChild(chip);
+    actions.appendChild(btnRow);
+    slot.appendChild(info);
+    slot.appendChild(actions);
+    el.appendChild(slot);
+  });
+}
+
+function openDispForm(d) {
+  dispEditingId = d ? d.id : null;
+  document.getElementById('disp-sheet-title').textContent = d ? '✏️ Editar disponibilidad' : '🟢 Publicar disponibilidad';
+  document.getElementById('disp-id').value       = d ? d.id : '';
+  document.getElementById('disp-fecha').value    = d ? d.fecha : '';
+  document.getElementById('disp-inicio').value   = d ? d.hora_inicio : '09:00';
+  document.getElementById('disp-fin').value      = d ? d.hora_fin : '18:00';
+  document.getElementById('disp-nota').value     = d ? (d.nota || '') : '';
+  document.getElementById('disp-activo').checked = d ? d.activo === 'true' : true;
+  document.getElementById('disp-delete').style.display = d ? '' : 'none';
+  document.getElementById('btn-disp-guardar').innerHTML = '💾 Guardar disponibilidad';
+  // Delay 10ms para que el click que abrió el form no se propague al overlay
+  setTimeout(function(){
+    document.getElementById('dispOverlay').classList.add('show');
+    document.getElementById('dispSheet').classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }, 10);
+}
+
+function closeDispSheet() {
+  document.getElementById('dispOverlay').classList.remove('show');
+  document.getElementById('dispSheet').classList.remove('show');
+  document.body.style.overflow = '';
+  dispEditingId = null;
+}
+
+function saveDisp() {
+  var fecha = document.getElementById('disp-fecha').value;
+  if (!fecha) { toast('La fecha es obligatoria.', 'err'); return; }
+  var data = {
+    id:          dispEditingId || '',
+    fecha:       fecha,
+    hora_inicio: document.getElementById('disp-inicio').value,
+    hora_fin:    document.getElementById('disp-fin').value,
+    nota:        document.getElementById('disp-nota').value.trim(),
+    activo:      document.getElementById('disp-activo').checked ? 'true' : 'false'
+  };
+  var btn = document.getElementById('btn-disp-guardar');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Guardando...';
+  apiPost(dispEditingId ? 'updateDisponibilidad' : 'createDisponibilidad', { data: data })
+    .then(function(res){
+      if (!dispEditingId && res.id) dispEditingId = res.id;
+      toast('Disponibilidad guardada ✅', 'ok');
+      document.getElementById('disp-delete').style.display = '';
+      loadDisp();
+    })
+    .catch(function(e){ toast('Error: ' + e.message, 'err'); })
+    .finally(function(){ btn.disabled = false; btn.innerHTML = '💾 Guardar disponibilidad'; });
+}
+
+function deleteDispUI() {
+  if (!dispEditingId) return;
+  if (!confirm('¿Eliminar este slot de disponibilidad?')) return;
+  apiPost('deleteDisponibilidad', { id: dispEditingId })
+    .then(function(){ toast('Eliminado.', 'warn'); closeDispSheet(); loadDisp(); })
+    .catch(function(e){ toast('Error: ' + e.message, 'err'); });
+}
+
+function quickToggleDisp(id, currentlyActive) {
+  var d = dispData.find(function(x){ return x.id === id; });
+  if (!d) return;
+  apiPost('updateDisponibilidad', { data: Object.assign({}, d, { activo: currentlyActive ? 'false' : 'true' }) })
+    .then(function(){ loadDisp(); toast(currentlyActive ? 'Slot ocultado' : 'Slot visible ✅', 'ok'); })
+    .catch(function(e){ toast('Error: ' + e.message, 'err'); });
+}
+
+function formatFechaLabel(dateStr) {
+  if (!dateStr) return '—';
+  var parts = dateStr.split('-');
+  var dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var d = new Date(dateStr + 'T12:00:00');
+  return dias[d.getDay()] + ' ' + parseInt(parts[2]) + ' de ' + MESES[parseInt(parts[1])-1];
+}
+
+if(!Promise.prototype.finally){Promise.prototype.finally=function(fn){return this.then(function(v){fn();return v;},function(e){fn();throw e;});};}
+</script>
+</body>
+</html>
